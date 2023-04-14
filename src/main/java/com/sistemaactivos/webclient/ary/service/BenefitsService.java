@@ -1,5 +1,6 @@
 package com.sistemaactivos.webclient.ary.service;
 
+import com.sistemaactivos.webclient.ary.model.Benefits;
 import com.sistemaactivos.webclient.ary.model.Costumer;
 import com.sistemaactivos.webclient.ary.model.ErrorResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,75 +12,75 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 
 @Service
-public class CostumerService implements ICostumerService {
+public class BenefitsService implements IBenefitsService {
 
     @Autowired
-    WebClient webClientCostumer;
+    WebClient webClientBenefits;
 
     @Override
-    public Flux<Costumer> findAll() {
-        return webClientCostumer.get()
-                .uri("/costumers")
+    public Flux<Benefits> findAll() {
+        return webClientBenefits.get()
+                .uri("/benefits")
                 .retrieve()
-                .bodyToFlux(Costumer.class)
+                .bodyToFlux(Benefits.class)
                 .timeout(Duration.ofMillis(10_000));
     }
 
     @Override
-    public Mono<Costumer> findByID(Integer id) {
-        return webClientCostumer.get()
-                .uri("/costumers/{id}", id)
+    public Mono<Benefits> findByID(Integer id) {
+        return webClientBenefits.get()
+                .uri("/benefits/{id}", id)
                 .retrieve()
                 .onStatus(status -> status.isError(),
                         response -> response.bodyToMono(ErrorResponse.class)
                                 .flatMap(errorResponse -> Mono.error(
                                         new RuntimeException(errorResponse.getStatus() + ": " + errorResponse.getMessage()))))
-                .bodyToMono(Costumer.class)
+                .bodyToMono(Benefits.class)
                 .timeout(Duration.ofMillis(10_000))
                 .switchIfEmpty(Mono.error(new RuntimeException("No se encontró el recurso")));
     }
 
     @Override
-    public Flux<Costumer> getCostumers(int pageSize, int pageNumber) {
+    public Flux<Benefits> getCostumers(int pageSize, int pageNumber) {
         int offset = pageSize * pageNumber;
-        return webClientCostumer.get()
-                .uri("/costumers?page={pageNumber}&size={pageSize}", pageNumber, pageSize)
+        return webClientBenefits.get()
+                .uri("/benefits?page={pageNumber}&size={pageSize}", pageNumber, pageSize)
                 .retrieve()
-                .bodyToFlux(Costumer.class)
+                .bodyToFlux(Benefits.class)
                 .skip(offset)
                 .take(pageSize);
     }
 
     @Override
-    public Mono<Costumer> create(Costumer costumer) {
-        return webClientCostumer.post()
-                .uri("/costumers")
-                .body(Mono.just(costumer), Costumer.class)
+    public Mono<Benefits> create(Benefits benefits) {
+        return webClientBenefits.post()
+                .uri("/benefits")
+                .body(Mono.just(benefits), Costumer.class)
                 .retrieve()
                 .onStatus(status -> status.isError(), response -> response.bodyToMono(ErrorResponse.class)
                         .flatMap(errorResponse -> Mono.error(new RuntimeException(errorResponse.getStatus() + ": " + errorResponse.getMessage()))))
-                .bodyToMono(Costumer.class)
+                .bodyToMono(Benefits.class)
                 .timeout(Duration.ofMillis(10000))
                 .switchIfEmpty(Mono.error(new RuntimeException("No se encontró el recurso")));
     }
 
     @Override
-    public Mono<Costumer> update(Integer id, Costumer costumer) {
-        return webClientCostumer.put()
-                .uri("/costumers/{id}", id)
-                .body(Mono.just(costumer), Costumer.class)
+    public Mono<Benefits> update(Integer id, Benefits benefits) {
+        return webClientBenefits.put()
+                .uri("/benefits/{id}", id)
+                .body(Mono.just(benefits), Costumer.class)
                 .retrieve()
                 .onStatus(status -> status.isError(), response -> response.bodyToMono(ErrorResponse.class)
                         .flatMap(errorResponse -> Mono.error(new RuntimeException(errorResponse.getStatus() + ": " + errorResponse.getMessage()))))
-                .bodyToMono(Costumer.class)
+                .bodyToMono(Benefits.class)
                 .timeout(Duration.ofMillis(10000))
                 .switchIfEmpty(Mono.error(new RuntimeException("No se encontró el recurso")));
     }
 
     @Override
     public Mono<Boolean> delete(Integer id) {
-        return webClientCostumer.delete()
-                .uri("/costumers/{id}", id)
+        return webClientBenefits.delete()
+                .uri("/benefits/{id}", id)
                 .retrieve()
                 .onStatus(status -> status.isError(), response -> response.bodyToMono(ErrorResponse.class)
                         .flatMap(errorResponse -> Mono.error(new RuntimeException(errorResponse.getStatus() + ": " + errorResponse.getMessage()))))

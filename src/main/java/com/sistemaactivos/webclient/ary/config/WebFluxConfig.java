@@ -21,21 +21,27 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
     org.slf4j.Logger Logger = LoggerFactory.getLogger(WebFluxConfig.class);
 
-    @Bean
-    public WebClient getWebClient(){
-        // Crea un objeto HttpClient de Reactor Netty para configurar la conexión.
+    @Bean(name = "webClientCostumer")
+    public WebClient getWebClientCostumer(){
+        return createWebClient("http://localhost:8087/api/v1","costumer", "123");
+    }
+
+    @Bean(name = "webClientBenefits")
+    public WebClient getWebClientBenefits(){
+        return createWebClient("http://localhost:8086/api/v1","benefits", "123");
+    }
+
+    private WebClient createWebClient(String url, String user, String password){
         HttpClient httpClient = HttpClient.create()
                 .tcpConfiguration(tcpClient ->
-                        tcpClient.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000).doOnConnected(connection ->
-                                connection.addHandlerLast(new ReadTimeoutHandler(10))
-                                        .addHandlerLast(new WriteTimeoutHandler(10))));
-
-        // Configura un objeto ClientHttpConnector de Reactor Netty para conectar al servidor.
+                        tcpClient.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
+                                .doOnConnected(connection ->
+                                        connection.addHandlerLast(new ReadTimeoutHandler(10))
+                                                .addHandlerLast(new WriteTimeoutHandler(10))));
         ClientHttpConnector connector = new ReactorClientHttpConnector(httpClient.wiretap(true));
-
-        // Crea y devuelve un objeto WebClient.
         return WebClient.builder()
-                .baseUrl("http://localhost:8087/api/v1")
+                .baseUrl(url)
+                .defaultHeaders(headers -> headers.setBasicAuth(user, password))
                 .clientConnector(connector)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();

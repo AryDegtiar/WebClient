@@ -8,4 +8,7 @@ public interface ICostumerService {
     Flux<Costumer> findAll();
     Mono<Costumer> findByID(Integer id);
     Flux<Costumer> getCostumers(int pageSize, int pageNumber);
+    Mono<?> delete(Integer id);
+    Mono<Costumer> create(Costumer costumer);
+    Mono<Costumer> update(Integer id, Costumer costumer);
 }

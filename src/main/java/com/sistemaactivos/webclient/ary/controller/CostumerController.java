@@ -31,4 +31,17 @@ public class CostumerController {
         return costumerService.getCostumers(pageSize, pageNumber);
     }
 
+    @PostMapping(path = {"/costumers"}, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<Costumer> createRecord(@RequestBody Costumer costumer) {
+        return costumerService.create(costumer);
+    }
+
+    @PutMapping(path = {"/costumers/{id}"}, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<Costumer> updateRecord(@PathVariable("id") Integer id, @RequestBody Costumer costumer) {
+        return costumerService.update(id, costumer);
+    }
+
+    @DeleteMapping(path = {"/costumers/{id}"})
+    public Mono<?> deleteRecord(@PathVariable("id") Integer id){ return costumerService.delete(id); }
+
 }
